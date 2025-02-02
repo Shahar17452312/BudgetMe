@@ -11,7 +11,7 @@ const getBudget = async (req, res) => {
         }
         const { id } = answer.payload;
 
-        const data = await db.query("SELECT amount FROM budget WHERE user_id=$1", [id]);
+        const data = await db.query("SELECT amount FROM budgets WHERE user_id=$1", [id]);
         if (data.rows.length === 0) {
             return res.status(404).json({ message: "There is no such field" });
         }

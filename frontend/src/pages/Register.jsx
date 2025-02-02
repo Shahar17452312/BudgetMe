@@ -40,6 +40,8 @@ function Register() {
             setFlag(false);
         }
         else{
+            localStorage.setItem("id",authResponse.data.id)
+            localStorage.setItem("name",authResponse.data.name)
             sessionStorage.setItem("accessToken",authResponse.data.accessToken);
             sessionStorage.setItem("refreshToken",authResponse.data.refreshToken);
         }
@@ -74,6 +76,7 @@ function Register() {
         setFlag(false);
 
     }
+
 
   
     

@@ -19,13 +19,14 @@ const registerController = async (req, res) => {
             return res.status(400).json({ message: "user is already registered" });
         }
         const hash = await bcrypt.hash(password, 10);
-        const data = await db.query("INSERT INTO users (name,email,password,date_of_creation) VALUES ($1,$2,$3,$4) RETURNING id"
+        const data = await db.query("INSERT INTO users (name,email,password,date_of_creation) VALUES ($1,$2,$3,$4) RETURNING id,name"
             , [name, email, hash, date_of_creation]);
         const accessToken = jwt.sign({ id: data.rows[0].id, name: name }, process.env.ACCESS_TOKEN_SECRET_KEY, { expiresIn: process.env.ACCESS_TOKEN_EXPIRES_TIME });
         const refreshToken = jwt.sign({ id: data.rows[0].id, name: name }, process.env.REFRESH_TOKEN_SECRET_KEY, { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_TIME });
         return res.status(200).json({
             message: "created",
             id:data.rows[0].id,
+            name:data.rows[0].name,
             accessToken: accessToken,
             refreshToken: refreshToken
         });

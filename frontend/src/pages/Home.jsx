@@ -31,6 +31,8 @@ function Home() {
     description: "",
     amount: "",
   });
+  const [budget,setBudget]=useState(0);
+  const [posOfExpense,setPosOfExpense]=useState(0)
 
   const [expensesByMonths, setExpensesByMonths] = useState(
     Array(12).fill().map((_, i) => ({ month: i + 1, expenses: 0 }))
@@ -46,7 +48,7 @@ function Home() {
   };
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetchExpense = async () => {
       try {
         let response = await axios.get("http://localhost:3000/expense/" + id, {
           headers: {
@@ -99,7 +101,49 @@ function Home() {
       }
     };
 
-    fetch();
+
+    const fetchBudget = async () => {
+      try {
+        let response = await axios.get("http://localhost:3000/budget/" + id, {
+          headers: {
+            Authorization: "Bearer " + accesstoken,
+          },
+        });
+
+        setBudget(response.data.amount);
+
+      } catch (error) {
+        console.log(error);
+        if (error.response.status === 401) {
+          try {
+            const newAccessToken = await axios.post("http://localhost:3000/auth/refresh-token", {
+              refreshToken: refreshToken,
+            });
+
+            sessionStorage.setItem("accessToken", newAccessToken.data.accessToken);
+            SetAccesstoken(sessionStorage.getItem("accessToken"));
+
+            try {
+              const response = await axios.get("http://localhost:3000/budget/" + id, {
+                headers: {
+                  Authorization: "Bearer " + accesstoken,
+                },
+              });
+              if (response.status === 200) {
+                setBudget(response.data.amount);
+              }
+            } catch (e) {
+              console.log(e.message);
+            }
+          } catch (e) {
+            console.log(e.message);
+          }
+        }
+      }
+    };
+
+    fetchExpense();
+    fetchBudget();
   }, [accesstoken, id, refreshToken]);
 
   const handleInputChange = (e) => {
@@ -133,6 +177,17 @@ function Home() {
         console.error("Error adding transaction:", error);
       });
   };
+
+  useEffect(() => {
+    let currentBudget = budget;
+    var i;
+    for(i=posOfExpense;i<rows.length;i++){
+      currentBudget-=rows[i].amount
+    }
+    setPosOfExpense(i);
+    setBudget(currentBudget);
+  }, [expensesByMonths]);
+  
 
   return (
     <div className="home-container" style={{ backgroundColor: "#e0f7fa" }}>
@@ -246,6 +301,7 @@ function Home() {
           <Legend />
           <Bar dataKey="expenses" fill="#8884d8" name="expenses" />
         </BarChart>
+        <h2 style={{ marginTop: "50px", color: budget>=0?"black":"red" }}>{budget}</h2>
         <h2 style={{ marginTop: "50px", color: "black" }}>Transactions</h2>
         <TableContainer component={Paper} style={{ maxWidth: "800px", margin: "0 auto" }}>
           <Table>
