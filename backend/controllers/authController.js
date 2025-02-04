@@ -10,12 +10,14 @@ const registerController = async (req, res) => {
     console.log(req.body);
 
     if (!name || !email || !password || !date_of_creation) {
+        console.log("not all the fields")
         return res.status(400).json({ message: "Missing fields" });
     }
 
     try {
         const answer = await db.query("SELECT name,email FROM users WHERE name=$1 OR email=$2", [name, email]);
         if (answer.rows.length > 0) {
+            console.log("user is already created")
             return res.status(400).json({ message: "user is already registered" });
         }
         const hash = await bcrypt.hash(password, 10);
@@ -38,6 +40,7 @@ const registerController = async (req, res) => {
         if (process.env.NODE_ENV === "test") {
             return res.status(500).json({ message: error.message, stack: error.stack });
         } else {
+            console.log("error of server")
             return res.status(500).json({ message: "Error during registration or database operation" });
         }
     }

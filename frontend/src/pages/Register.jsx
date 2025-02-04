@@ -37,6 +37,7 @@ function Register() {
 
 
         if(authResponse.status!=200){
+          console.log(authResponse.data);
             setFlag(false);
         }
         else{
@@ -55,7 +56,8 @@ function Register() {
                 Authorization: "Bearer "+authResponse.data.accessToken 
               }
         });
-        if(budgetResponse.status!=200){
+        if(budgetResponse.status!=202){
+          console.log(authResponse.data);
             setFlag(false);
         }
 

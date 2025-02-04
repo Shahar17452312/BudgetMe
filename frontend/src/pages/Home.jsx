@@ -355,7 +355,7 @@ function Home() {
             onChange={handleInputChange}
             placeholder="Money"
           />
-          <button onClick={handleAddTransaction}>Add</button>
+          <button id="addExpenseButton" onClick={handleAddTransaction}>Add</button>
         </div>
       </div>
     </div>
